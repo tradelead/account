@@ -1,0 +1,39 @@
+{
+  "name": "traderscore",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test:unit": "jest unit",
+    "test:int:up": "docker-compose -f tests/integration/dc-test.yml up -d --remove-orphans",
+    "test:int:down": "docker-compose -f tests/integration/dc-test.yml down --remove-orphans",
+    "test:int": "NODE_ENV=test jest --setupTestFrameworkScriptFile=./tests/integration/env-setup.js --runInBand --forceExit --detectOpenHandles int",
+    "db:migrate": "(cd src/adapters/knex && knex migrate:latest --env production)",
+    "db:setup": "node src/adapters/knex/scripts/dbSetup.js",
+    "infra:allow-ssh-my-ip": "node infra/scripts/allowSSHMyIP.js",
+    "infra:deny-ssh-my-ip": "node infra/scripts/denySSHMyIP.js",
+    "infra:create-rds-tunnel": "node infra/scripts/createRDSTunnel.js",
+    "infra:close-rds-tunnel": "node infra/scripts/closeRDSTunnel.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-lambda": "^2.4.8",
+    "aws-sdk": "^2.427.0",
+    "dataloader": "^1.4.0",
+    "graphql": "^14.2.1",
+    "graphql-tag": "^2.10.1",
+    "graphql-tools": "^4.0.4",
+    "joi": "^14.3.1",
+    "knex": "^0.16.3",
+    "mysql": "^2.16.0",
+    "verror": "^1.10.0"
+  },
+  "devDependencies": {
+    "dotenv": "^7.0.0",
+    "eslint": "^5.14.1",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-jest": "^22.3.0",
+    "jest": "^24.1.0",
+    "sinon": "^7.2.5"
+  }
+}
