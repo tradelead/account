@@ -2,16 +2,17 @@ const Joi = require('joi');
 const validate = require('../utils/validateSchema');
 
 module.exports = class UpdateAccountData {
-  constructor({ accountDataConfig, accountDataRepo }) {
+  constructor({ accountDataConfig, dataTypeServices }) {
     this.accountDataConfig = accountDataConfig;
-    this.accountDataRepo = accountDataRepo;
+    this.dataTypeServices = dataTypeServices;
+
     this.schema = Joi.object().keys({
       auth: Joi.object().keys({
         id: Joi.string().label('Auth User ID'),
         roles: Joi.array().items(Joi.string()),
       }).unknown().allow(null, false),
       userID: Joi.string().required().label('User ID'),
-      data: generateSchema(this.accountDataConfig),
+      data: Joi.object().required(),
     });
   }
 
@@ -22,17 +23,21 @@ module.exports = class UpdateAccountData {
       throw new Error('Invalid permissions');
     }
 
-    await this.accountDataRepo.updateAccountData({ userID, data });
+    const splitData = splitDataByKeyType(this.accountDataConfig, data);
+
+    await Promise.all(Object.keys(splitData).map(async (type) => {
+      const updateService = this.dataTypeServices[type];
+      return updateService({ userID, data: splitData[type] });
+    }));
   }
 };
 
-function generateSchema(accountDataConfig) {
-  const dataSchemaKeys = {};
-  accountDataConfig.forEach((item) => {
-    if (item.type === 'string') {
-      dataSchemaKeys[item.key] = Joi.string();
-    }
-  });
+function splitDataByKeyType(dataConfig, data) {
+  return Object.keys(data).reduce((acc, key) => {
+    const { type } = dataConfig[key];
+    acc[type] = acc[type] || {};
+    acc[type][key] = data[key];
 
-  return Joi.object().keys(dataSchemaKeys);
+    return acc;
+  }, {});
 }

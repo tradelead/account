@@ -6,7 +6,7 @@ exports.up = async function (knex) {
     t.increments('ID').primary();
     t.string('userID', 60).notNullable();
     t.string('metaKey', 60).notNullable();
-    t.string('metaValue', 60).notNullable();
+    t.text('metaValue').notNullable();
     t.timestamps();
 
     t.index(['ID']);

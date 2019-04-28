@@ -24,8 +24,8 @@ describe('update and get bio', () => {
 
     const { userID } = req;
     const keys = ['bio'];
-    const [data] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
-    expect(data).toHaveProperty('bio', req.data.bio);
+    const [accountData] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
+    expect(accountData).toHaveProperty('data.bio', req.data.bio);
   });
 
   it('throws error when updating other trader bio when authenticated', async () => {
@@ -43,8 +43,8 @@ describe('update and get bio', () => {
 
     const { userID } = req;
     const keys = ['bio'];
-    const [data] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
-    expect(data).toHaveProperty('bio', req.data.bio);
+    const [accountData] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
+    expect(accountData).toHaveProperty('data.bio', req.data.bio);
   });
 });
 
@@ -61,36 +61,36 @@ describe('get profilePhoto', () => {
 
   it('can get profilePhoto', async () => {
     const { userID } = imageReq;
-    const image = await app.useCases.getAccountData({
-      data: [{ userID, keys: ['profilePhoto'] }],
+    const [accountData] = await app.useCases.getAccountData({
+      data: [{ userID, keys: [{ key: 'profilePhoto' }] }],
     });
 
-    expect(image).toHaveProperty('url', imageReq.url);
-    expect(image).toHaveProperty('width', 700);
-    expect(image).toHaveProperty('height', 500);
+    expect(accountData.data.profilePhoto.url).toEqual(imageReq.url);
+    expect(accountData.data.profilePhoto.width).toEqual(700);
+    expect(accountData.data.profilePhoto.height).toEqual(500);
   });
 
   it('can get profilePhoto cropped as thumbnail', async () => {
     const { userID } = imageReq;
-    const image = await app.useCases.getAccountData({
+    const [accountData] = await app.useCases.getAccountData({
       data: [{ userID, keys: [{ key: 'profilePhoto', size: 'thumbnail' }] }],
     });
 
-    const res = await fetch(imageReq.url);
+    const res = await fetch(accountData.data.profilePhoto.url);
     expect(res.status).toEqual(200);
-    expect(image).toHaveProperty('width', 150);
-    expect(image).toHaveProperty('height', 150);
+    expect(accountData.data.profilePhoto.width).toEqual(150);
+    expect(accountData.data.profilePhoto.height).toEqual(150);
   });
 
   it('can get profilePhoto cropped to small', async () => {
     const { userID } = imageReq;
-    const image = await app.useCases.getAccountData({
+    const [accountData] = await app.useCases.getAccountData({
       data: [{ userID, keys: [{ key: 'profilePhoto', size: 'medium' }] }],
     });
 
-    const res = await fetch(imageReq.url);
+    const res = await fetch(accountData.data.profilePhoto.url);
     expect(res.status).toEqual(200);
-    expect(image).toHaveProperty('width', 300);
-    expect(image).toHaveProperty('height', 300);
+    expect(accountData.data.profilePhoto.width).toEqual(300);
+    expect(accountData.data.profilePhoto.height).toEqual(300);
   });
 });
