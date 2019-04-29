@@ -1,6 +1,5 @@
 const { promisify } = require('util');
 const parseUrl = require('url').parse;
-const fetch = require('node-fetch');
 const https = require('https');
 const FormData = require('form-data');
 const app = require('../../src/app.bootstrap');
@@ -50,9 +49,9 @@ describe('SignUpload', () => {
         resolve(res);
       });
     }));
-    console.log(imageRes);
 
-    form.append('file', imageRes);
+    form.append('Content-Type', 'image/png');
+    form.append('file', imageRes, { contentType: 'image/png' });
 
     const submit = promisify(form.submit.bind(form));
 

@@ -18,7 +18,7 @@ module.exports = class UploadSigner {
         'x-amz-meta-key': key,
       },
       Conditions: [
-        // ['starts-with', '$Content-Type', 'image/'], // only images
+        ['starts-with', '$Content-Type', 'image/'], // only images
         ['content-length-range', 0, 5000000], // 5 MB
       ],
     });
