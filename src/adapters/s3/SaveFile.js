@@ -1,4 +1,4 @@
-const mime = require('mime-types');
+const fileType = require('file-type');
 
 module.exports = class SaveFile {
   constructor({ s3, bucket }) {
@@ -12,7 +12,7 @@ module.exports = class SaveFile {
       Bucket: this.bucket,
       Key: filepath,
       Body: buf,
-      ContentType: mime.lookup(filepath),
+      ContentType: fileType(buf).mime,
     }).promise();
 
     return `https://${this.bucket}.s3.amazonaws.com/${filepath}`;

@@ -34,11 +34,15 @@ const accountDataConfig = {
 /** setup adapters */
 
 const AccountDataRepo = require('./adapters/knex/AccountDataRepo');
-const SaveFileS3 = require('./adapters/SaveFileS3');
+const SaveFileS3 = require('./adapters/s3/SaveFile');
+const UploadSignerS3 = require('./adapters/s3/UploadSigner');
 
 const accountDataRepo = new AccountDataRepo({ knex });
+
 const saveFileClass = new SaveFileS3({ s3, bucket: process.env.S3_BUCKET });
 const saveFile = saveFileClass.execute.bind(saveFileClass);
+
+const uploadSigner = new UploadSignerS3({ s3, bucket: process.env.S3_BUCKET });
 
 /** setup services */
 
@@ -64,6 +68,7 @@ const getAccountImageData = new GetAccountImageData({
 
 const GetAccountData = require('./core/useCases/GetAccountData');
 const UpdateAccountData = require('./core/useCases/UpdateAccountData');
+const SignUpload = require('./core/useCases/SignUpload');
 
 const dataTypeGetServices = {
   string: getAccountStringData.execute.bind(getAccountStringData),
@@ -84,6 +89,11 @@ const updateAccountData = new UpdateAccountData({
   accountDataConfig,
 });
 
+const signUpload = new SignUpload({
+  accountDataConfig,
+  uploadSigner,
+});
+
 /** setup controllers */
 
 const NewImageUpload = require('./core/controllers/NewImageUpload');
@@ -94,6 +104,7 @@ module.exports = {
   useCases: {
     updateAccountData: updateAccountData.execute.bind(updateAccountData),
     getAccountData: getAccountData.execute.bind(getAccountData),
+    signUpload: signUpload.execute.bind(signUpload),
   },
   controllers: {
     newImageUpload: newImageUpload.execute.bind(newImageUpload),
