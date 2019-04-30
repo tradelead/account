@@ -159,5 +159,6 @@ module.exports = {
   controllers: {
     newImageUpload: newImageUpload.execute.bind(newImageUpload),
   },
+  accountDataConfig,
   events,
 };

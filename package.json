@@ -23,6 +23,7 @@
     "file-type": "^10.11.0",
     "form-data": "^2.3.3",
     "graphql": "^14.2.1",
+    "graphql-fields": "^2.0.3",
     "graphql-tag": "^2.10.1",
     "graphql-tools": "^4.0.4",
     "joi": "^14.3.1",
