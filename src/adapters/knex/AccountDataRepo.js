@@ -29,7 +29,6 @@ module.exports = class AccountDataRepo {
 };
 
 async function bulkUpdate(items) {
-  console.log(items);
   const columns = ['userID', 'metaKey', 'metaValue'];
 
   let dataLength = 0;

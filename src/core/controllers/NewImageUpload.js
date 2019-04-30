@@ -17,7 +17,6 @@ module.exports = class NewImageUpload {
     const { userID, key, url } = validate(this.schema, req);
 
     // delete all image key data for all sizes
-    console.log({ userID, key });
     await this.deleteAccountImageData.execute({ userID, key });
 
     const data = {};

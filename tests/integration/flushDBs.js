@@ -6,5 +6,5 @@ const knex = knexFactory(knexConfig.test);
 
 module.exports = async function () {
   await knex('accountData').truncate();
-  // await knex('exchangeKeys').truncate();
+  await knex('exchangeKeys').truncate();
 };
