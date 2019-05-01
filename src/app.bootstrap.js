@@ -42,6 +42,7 @@ const SaveFileS3 = require('./adapters/s3/SaveFile');
 const UploadSignerS3 = require('./adapters/s3/UploadSigner');
 const EncrypterAWSKMS = require('./adapters/awskms/Encrypter');
 const ExchangeKeysRepo = require('./adapters/knex/ExchangeKeysRepo');
+const KeycloakAuthService = require('./adapters/keycloak/AuthService');
 
 const accountDataRepo = new AccountDataRepo({ knex });
 
@@ -52,6 +53,12 @@ const uploadSigner = new UploadSignerS3({ s3, bucket: process.env.S3_BUCKET });
 
 const encrypter = new EncrypterAWSKMS({ kms, cmkID: process.env.AWS_KMS_CMK });
 const exchangeKeysRepo = new ExchangeKeysRepo({ knex, encrypter });
+const authService = new KeycloakAuthService({
+  serverUrl: process.env.KEYCLOAK_SERVER_URL,
+  realm: process.env.KEYCLOAK_REALM,
+  clientId: process.env.KEYCLOAK_CLIENT_ID,
+  clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
+});
 
 /** setup services */
 
@@ -155,6 +162,9 @@ module.exports = {
     addExchangeKeys: addExchangeKeys.execute.bind(addExchangeKeys),
     getExchangeKeys: getExchangeKeys.execute.bind(getExchangeKeys),
     deleteExchangeKeys: deleteExchangeKeys.execute.bind(deleteExchangeKeys),
+  },
+  services: {
+    authService,
   },
   controllers: {
     newImageUpload: newImageUpload.execute.bind(newImageUpload),
