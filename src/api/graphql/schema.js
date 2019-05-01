@@ -46,10 +46,10 @@ type ExchangeKey {
   exchangeID: ID!
   tokenLast4: String!
   "only returned when authenticated as system role"
-  token: String!
+  token: String
   secretLast4: String!
   "only returned when authenticated as system role"
-  secret: String!
+  secret: String
 }
 
 type Query {
@@ -93,11 +93,17 @@ schema {
 
 const userDataLoader = new Dataloader(async (items) => {
   // consolidate items to fetch
-  const data = items.reduce((acc, item) => {
+  const data = Object.values(items.reduce((acc, item) => {
     acc[item.id] = acc[item.id] || { userID: item.id, keys: [] };
 
     if (item.type === 'user') {
-      const keys = Object.keys(item.fields);
+      const keys = Object
+        .keys(item.fields)
+        .filter(key => (
+          key !== 'id'
+          && app.accountDataConfig[key]
+          && app.accountDataConfig[key].type !== 'image'
+        ));
       acc[item.id].keys.push(...keys);
     } else if (item.type === 'field') {
       if (item.input) {
@@ -111,10 +117,11 @@ const userDataLoader = new Dataloader(async (items) => {
     }
 
     return acc;
-  }, {});
+  }, {}));
 
   // fetch account data
-  const accountData = await app.useCases.getAccountData({ data: Object.values(data) });
+  const accountData = await app.useCases.getAccountData({ data });
+
   const accountDataObj = accountData.reduce((acc, resp) => {
     const { userID } = resp;
     acc[userID] = resp.data;
@@ -144,16 +151,22 @@ const userDataLoader = new Dataloader(async (items) => {
 
 const resolvers = {
   Query: {
-    async getUsers(root, { id }, _, info) {
+    async getUsers(root, { ids }, _, info) {
       const fields = graphqlFields(info);
-      return userDataLoader.load({ type: 'user', id, fields });
+      const promises = ids.map(async id => userDataLoader.load({
+        type: 'user',
+        id,
+        fields,
+      }));
+
+      return Promise.all(promises);
     },
     async getExchangeKeys(root, { userID, exchangeIDs }, context) {
       return app.useCases.getExchangeKeys({ auth: context.auth, userID, exchangeIDs });
     },
   },
   User: {
-    async profilePhoto(user, { input }) {
+    async profilePhoto(user, input) {
       return userDataLoader.load({
         type: 'field',
         id: user.id,
