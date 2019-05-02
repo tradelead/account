@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  CoreStack:
+    Type: String
+  MySQLDbName:
+    Type: String
+  MySQLPass:
+    Type: String
+  MySQLUser:
+    Type: String
+  NodeEnv:
+    Type: String
+Resources:
+  AccountMedia:
+    Type: AWS::S3::Bucket
+  AccountMediaBucketInvokeUploadComplete:
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref 'UploadComplete'
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt 'AccountMedia.Arn'
+    Type: AWS::Lambda::Permission
+  GraphQL:
+    Properties:
+      CodeUri: ../.
+      Environment:
+        Variables:
+          DATABASE_HOST: !ImportValue
+            Fn::Sub: ${CoreStack}-MySQL-Address
+          DATABASE_NAME: !Ref 'MySQLDbName'
+          DATABASE_PASSWORD: !Ref 'MySQLPass'
+          DATABASE_POOL_MAX: 2
+          DATABASE_POOL_MIN: 1
+          DATABASE_PORT: !ImportValue
+            Fn::Sub: ${CoreStack}-MySQL-Port
+          DATABASE_USER: !Ref 'MySQLUser'
+          NODE_ENV: !Ref 'NodeEnv'
+      Events:
+        API:
+          Properties:
+            Method: post
+            Path: /graphql
+          Type: Api
+      Handler: src/lambda/GraphQL.handler
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Runtime: nodejs8.10
+      VpcConfig:
+        SecurityGroupIds:
+          - !ImportValue
+            Fn::Sub: ${CoreStack}-RDS-Access-SG-ID
+        SubnetIds:
+          - !ImportValue
+            Fn::Sub: ${CoreStack}-SubnetID
+    Type: AWS::Serverless::Function
+  UploadComplete:
+    Properties:
+      CodeUri: ../.
+      Environment:
+        Variables:
+          DATABASE_HOST: !ImportValue
+            Fn::Sub: ${CoreStack}-MySQL-Address
+          DATABASE_NAME: !Ref 'MySQLDbName'
+          DATABASE_PASSWORD: !Ref 'MySQLPass'
+          DATABASE_POOL_MAX: 2
+          DATABASE_POOL_MIN: 1
+          DATABASE_PORT: !ImportValue
+            Fn::Sub: ${CoreStack}-MySQL-Port
+          DATABASE_USER: !Ref 'MySQLUser'
+          NODE_ENV: !Ref 'NodeEnv'
+      Handler: src/lambda/UploadComplete.handler
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Runtime: nodejs8.10
+      VpcConfig:
+        SecurityGroupIds:
+          - !ImportValue
+            Fn::Sub: ${CoreStack}-RDS-Access-SG-ID
+        SubnetIds:
+          - !ImportValue
+            Fn::Sub: ${CoreStack}-SubnetID
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31
