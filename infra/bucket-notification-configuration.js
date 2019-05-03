@@ -33,11 +33,13 @@ const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
       LambdaFunctionConfigurations: [
         {
           Events: ['s3:ObjectCreated:*'],
-          FunctionArn: outputs.UploadCompleteArn,
+          LambdaFunctionArn: outputs.UploadCompleteArn,
         },
       ],
     },
   };
 
   await s3.putBucketNotificationConfiguration(params).promise();
-})();
+})().catch((e) => {
+  throw e;
+});
