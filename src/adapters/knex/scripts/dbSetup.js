@@ -37,10 +37,7 @@ const query = util.promisify(connection.query).bind(connection);
 
     if (!results[0] || !results[0].userExists) {
       await query(`CREATE USER '${process.env.DATABASE_USER}'@'%'`);
-      await query(`
-      GRANT ALL PRIVILEGES ON ${process.env.DATABASE_NAME}.* To '${process.env.DATABASE_USER}'@'%' 
-      IDENTIFIED BY '${process.env.DATABASE_PASSWORD}'
-      `);
+      await query(`GRANT ALL PRIVILEGES ON ${process.env.DATABASE_NAME}.* To '${process.env.DATABASE_USER}'@'%' IDENTIFIED BY '${process.env.DATABASE_PASSWORD}'`);
     }
 
     console.log('DB AND USER CREATED IF NOT EXISTS');
