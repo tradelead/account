@@ -79,6 +79,15 @@ jobs:
       - image: circleci/node:8
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - node-modules-dev-{{ checksum "package-lock.json" }}
+            - node-modules-dev
+      - run: NODE_ENV=development npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: node-modules-dev-{{ checksum "package-lock.json" }}
       - attach_workspace:
           at: workspace
       - run: sudo apt-get install python-dev
