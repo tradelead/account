@@ -1,4 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Outputs:
+  AccountMediaBucket:
+    Export:
+      Name: !Sub '${AWS::StackName}-AccountMediaBucket'
+    Value: !Ref 'AccountMedia'
+  UploadCompleteArn:
+    Export:
+      Name: !Sub '${AWS::StackName}-UploadCompleteArn'
+    Value: !GetAtt 'UploadComplete.Arn'
 Parameters:
   CoreStack:
     Type: String

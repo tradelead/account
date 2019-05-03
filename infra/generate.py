@@ -1,4 +1,4 @@
-from troposphere import Tags, ImportValue, Parameter, Sub, GetAtt, Ref, Join
+from troposphere import Tags, ImportValue, Parameter, Sub, GetAtt, Ref, Join, Output, Export
 from troposphere import Template
 from troposphere import serverless, awslambda, s3, iam
 
@@ -78,6 +78,16 @@ t.add_resource(awslambda.Permission(
     Principal = 's3.amazonaws.com',
     SourceArn = accountMediaBucket.GetAtt('Arn')
 ))
+
+def createExport(name, value, exportName):
+    t.add_output(Output(
+        name, 
+        Value = value, 
+        Export = Export(exportName)
+    ))
+
+createExport('AccountMediaBucket', accountMediaBucket.Ref(), Sub('${AWS::StackName}-AccountMediaBucket'))
+createExport('UploadCompleteArn', uploadComplete.GetAtt('Arn'), Sub('${AWS::StackName}-UploadCompleteArn'))
 
 # Save File
 
