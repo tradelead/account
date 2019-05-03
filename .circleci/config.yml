@@ -76,7 +76,7 @@ jobs:
             - changesetname.txt
   executeChangeSet:
     docker:
-      - image: circleci/buildpack-deps:jessie
+      - image: circleci/node:8
     steps:
       - attach_workspace:
           at: workspace
