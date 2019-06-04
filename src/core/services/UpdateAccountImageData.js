@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const probe = require('probe-image-size');
 const validate = require('../utils/validateSchema');
 

@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const fetch = require('node-fetch');
 const sharp = require('sharp');
 const urlUtil = require('url');

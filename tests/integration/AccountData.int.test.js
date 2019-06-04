@@ -48,6 +48,68 @@ describe('update and get bio', () => {
   });
 });
 
+describe('update and get website', () => {
+  let req = {};
+
+  beforeEach(() => {
+    req = {
+      auth: {
+        id: 'user123',
+        email: 'user@email.com',
+        username: 'testuser',
+        roles: ['trader'],
+      },
+      userID: 'user123',
+      data: {
+        website: 'http://test.com',
+      },
+    };
+  });
+
+  it('updates when authenticated', async () => {
+    await app.useCases.updateAccountData(req);
+
+    const { userID } = req;
+    const keys = ['website'];
+    const [accountData] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
+    expect(accountData).toHaveProperty('data.website', req.data.website);
+  });
+
+  it('updates when url doesn\'t contain protocol and defaults to http', async () => {
+    req.data.website = 'test.com';
+    await app.useCases.updateAccountData(req);
+
+    const { userID } = req;
+    const keys = ['website'];
+    const [accountData] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
+    expect(accountData).toHaveProperty('data.website', 'http://test.com');
+  });
+
+  it('throws error when updating with invalid url', async () => {
+    req.data.website = 'thisisnotavalidtld.cmo';
+    await expect(app.useCases.updateAccountData(req)).rejects.toThrow('"website" must be valid domain or url.');
+  });
+
+  it('throws error when updating other trader when authenticated', async () => {
+    req.userID = 'user234';
+    await expect(app.useCases.updateAccountData(req)).rejects.toThrow('Invalid permissions');
+  });
+
+  it('throws error when updating and not authenticated', async () => {
+    req.auth = null;
+    await expect(app.useCases.updateAccountData(req)).rejects.toThrow('Invalid permissions');
+  });
+
+  it('get when not authenticated', async () => {
+    app.useCases.updateAccountData(req);
+
+    const { userID } = req;
+    const keys = ['website'];
+    const [accountData] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
+    expect(accountData).toHaveProperty('data.website', req.data.website);
+  });
+});
+
 describe('get profilePhoto', () => {
   const imageReq = {
     url: 'https://via.placeholder.com/700x500.png',

@@ -3,6 +3,7 @@ const { EventEmitter } = require('events');
 const AWS = require('aws-sdk');
 const knexFactory = require('knex');
 const knexConfig = require('./adapters/knex/knexfile');
+const validExchanges = require('./validExchanges');
 
 const env = process.env.NODE_ENV || 'development';
 const knex = knexFactory(knexConfig[env]);
@@ -16,6 +17,10 @@ const accountDataConfig = {
   bio: {
     key: 'bio',
     type: 'string',
+  },
+  website: {
+    key: 'website',
+    type: 'url',
   },
   profilePhoto: {
     key: 'profilePhoto',
@@ -64,12 +69,16 @@ const authService = new KeycloakAuthService({
 
 const GetAccountStringData = require('./core/services/GetAccountStringData');
 const UpdateAccountStringData = require('./core/services/UpdateAccountStringData');
+const GetAccountUrlData = require('./core/services/GetAccountUrlData');
+const UpdateAccountUrlData = require('./core/services/UpdateAccountUrlData');
 const GetAccountImageData = require('./core/services/GetAccountImageData');
 const UpdateAccountImageData = require('./core/services/UpdateAccountImageData');
 const DeleteAccountImageData = require('./core/services/DeleteAccountImageData');
 
 const getAccountStringData = new GetAccountStringData({ accountDataConfig, accountDataRepo });
 const updateAccountStringData = new UpdateAccountStringData({ accountDataConfig, accountDataRepo });
+const getAccountUrlData = new GetAccountUrlData({ accountDataConfig, accountDataRepo });
+const updateAccountUrlData = new UpdateAccountUrlData({ accountDataConfig, accountDataRepo });
 
 const updateAccountImageData = new UpdateAccountImageData({ accountDataConfig, accountDataRepo });
 const deleteAccountImageData = new DeleteAccountImageData({ accountDataConfig, accountDataRepo });
@@ -91,6 +100,7 @@ const DeleteExchangeKeys = require('./core/useCases/DeleteExchangeKeys');
 
 const dataTypeGetServices = {
   string: getAccountStringData.execute.bind(getAccountStringData),
+  url: getAccountUrlData.execute.bind(getAccountUrlData),
   image: getAccountImageData.execute.bind(getAccountImageData),
 };
 
@@ -101,6 +111,7 @@ const getAccountData = new GetAccountData({
 
 const dataTypeUpdateServices = {
   string: updateAccountStringData.execute.bind(updateAccountStringData),
+  url: updateAccountUrlData.execute.bind(updateAccountUrlData),
 };
 
 const updateAccountData = new UpdateAccountData({
@@ -113,7 +124,7 @@ const signUpload = new SignUpload({
   uploadSigner,
 });
 
-const addExchangeKeys = new AddExchangeKeys({ exchangeKeysRepo, events });
+const addExchangeKeys = new AddExchangeKeys({ exchangeKeysRepo, events, validExchanges });
 const getExchangeKeys = new GetExchangeKeys({ exchangeKeysRepo });
 const deleteExchangeKeys = new DeleteExchangeKeys({ exchangeKeysRepo, events });
 
@@ -153,7 +164,6 @@ events.on('deletedExchangeKeys', async ({ userID, exchangeID }) => {
 });
 
 /** setup exports */
-
 module.exports = {
   useCases: {
     updateAccountData: updateAccountData.execute.bind(updateAccountData),
@@ -170,5 +180,6 @@ module.exports = {
     newImageUpload: newImageUpload.execute.bind(newImageUpload),
   },
   accountDataConfig,
+  validExchanges,
   events,
 };

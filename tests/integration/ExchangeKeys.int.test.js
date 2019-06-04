@@ -1,6 +1,17 @@
 const app = require('../../src/app.bootstrap');
 const flushDBs = require('./flushDBs');
 
+jest.mock('../../src/validExchanges', () => ([
+  {
+    exchangeID: 'binance',
+    exchangeLabel: 'Binance',
+  },
+  {
+    exchangeID: 'bittrex',
+    exchangeLabel: 'Bittrex',
+  },
+]));
+
 let req = {};
 
 beforeEach(async () => {
@@ -36,6 +47,12 @@ describe('addExchangeKeys', () => {
 
     const { userID, exchangeID } = req;
     expect(emitted).toEqual({ userID, exchangeID });
+  });
+
+  it('throws error when not a valid exchange', async () => {
+    req.exchangeID = 'notAValidExchange';
+    await expect(app.useCases.addExchangeKeys(req))
+      .rejects.toThrow('"Exchange ID" must be one of [binance, bittrex]');
   });
 
   it('throws error when trader exchange already exists', async () => {

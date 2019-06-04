@@ -13,11 +13,11 @@ test('getUsers with profilePhoto', async () => {
       data: [
         {
           userID: 'user1',
-          keys: ['bio'],
+          keys: ['bio', 'website'],
         },
         {
           userID: 'user2',
-          keys: ['bio'],
+          keys: ['bio', 'website'],
         },
       ],
     })
@@ -26,12 +26,14 @@ test('getUsers with profilePhoto', async () => {
         userID: 'user1',
         data: {
           bio: 'this is my bio',
+          website: 'http://test.com',
         },
       },
       {
         userID: 'user2',
         data: {
           bio: 'this is my bio',
+          website: 'http://test.com',
         },
       },
     ]);
@@ -86,6 +88,7 @@ test('getUsers with profilePhoto', async () => {
     getUsers(ids: ["user1", "user2"]) {
       id
       bio
+      website
       profilePhoto(size: thumbnail) {
         url
         width
@@ -104,6 +107,7 @@ test('getUsers with profilePhoto', async () => {
       {
         id: 'user1',
         bio: 'this is my bio',
+        website: 'http://test.com',
         profilePhoto: {
           url: 'http://example.com/thumbnail.png',
           width: 150,
@@ -113,6 +117,7 @@ test('getUsers with profilePhoto', async () => {
       {
         id: 'user2',
         bio: 'this is my bio',
+        website: 'http://test.com',
         profilePhoto: {
           url: 'http://example.com/thumbnail2.png',
           width: 150,
@@ -183,17 +188,110 @@ test('getExchangeKeys', async () => {
 });
 
 test('updateUser', async () => {
+  const source = `mutation {
+    updateUser(id: "user1", input: { bio: "Test Bio", website: "http://test.com" })
+  }`;
 
+  const context = { auth: { test: 1 } };
+  await graphql(
+    schema,
+    source,
+    null,
+    context,
+  );
+
+  sinon.assert.calledWith(app.useCases.updateAccountData, {
+    auth: context.auth,
+    userID: 'user1',
+    data: {
+      bio: 'Test Bio',
+      website: 'http://test.com',
+    },
+  });
 });
 
 test('addExchangeKeys', async () => {
+  const source = `mutation {
+    addExchangeKeys(input: { 
+      userID: "user1",
+      exchangeID: "exchange1",
+      token: "token123",
+      secret: "secret123",
+    })
+  }`;
 
+  const context = { auth: { test: 1 } };
+  await graphql(
+    schema,
+    source,
+    null,
+    context,
+  );
+
+  sinon.assert.calledWith(app.useCases.addExchangeKeys, {
+    auth: context.auth,
+    userID: 'user1',
+    exchangeID: 'exchange1',
+    token: 'token123',
+    secret: 'secret123',
+  });
 });
 
 test('deleteExchangeKeys', async () => {
+  const source = `mutation {
+    deleteExchangeKeys(userID: "user1", exchangeID: "exchange1")
+  }`;
 
+  const context = { auth: { test: 1 } };
+  await graphql(
+    schema,
+    source,
+    null,
+    context,
+  );
+
+  sinon.assert.calledWith(app.useCases.deleteExchangeKeys, {
+    auth: context.auth,
+    userID: 'user1',
+    exchangeID: 'exchange1',
+  });
 });
 
 test('signUpload', async () => {
+  app.useCases.signUpload
+    .withArgs(sinon.match({
+      auth: { test: 1 },
+      userID: 'user1',
+      key: 'profilePhoto',
+    }))
+    .resolves({
+      url: 'http://testurl.com',
+      fields: {
+        randomA: '1',
+        randomB: '2',
+      },
+    });
 
+  const source = `mutation {
+    signUpload(userID: "user1", key: "profilePhoto") {
+      url
+      fields
+    }
+  }`;
+
+  const context = { auth: { test: 1 } };
+  const res = await graphql(
+    schema,
+    source,
+    null,
+    context,
+  );
+
+  expect(res.data.signUpload).toEqual({
+    url: 'http://testurl.com',
+    fields: {
+      randomA: '1',
+      randomB: '2',
+    },
+  });
 });

@@ -1,10 +1,11 @@
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const validate = require('../utils/validateSchema');
 
 module.exports = class AddExchangeKeys {
-  constructor({ exchangeKeysRepo, events }) {
+  constructor({ exchangeKeysRepo, events, validExchanges }) {
     this.exchangeKeysRepo = exchangeKeysRepo;
     this.events = events;
+    this.validExchanges = validExchanges;
 
     this.schema = Joi.object().keys({
       auth: Joi.object().keys({
@@ -12,7 +13,7 @@ module.exports = class AddExchangeKeys {
         roles: Joi.array().items(Joi.string()),
       }).unknown().allow(null, false),
       userID: Joi.string().required().label('User ID'),
-      exchangeID: Joi.string().required().label('Exchange ID'),
+      exchangeID: Joi.string().required().valid(validExchanges.map(e => e.exchangeID)).label('Exchange ID'),
       token: Joi.string().required().label('Token'),
       secret: Joi.string().required().label('Secret'),
     });

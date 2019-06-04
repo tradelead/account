@@ -9,10 +9,24 @@ module.exports = {
     getExchangeKeys: sinon.stub(),
     deleteExchangeKeys: sinon.stub(),
   },
+  validExchanges: [
+    {
+      exchangeID: 'binance',
+      exchangeLabel: 'Binance',
+    },
+    {
+      exchangeID: 'bittrex',
+      exchangeLabel: 'Bittrex',
+    },
+  ],
   accountDataConfig: {
     bio: {
       key: 'bio',
       type: 'string',
+    },
+    website: {
+      key: 'website',
+      type: 'url',
     },
     profilePhoto: {
       key: 'profilePhoto',

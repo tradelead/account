@@ -40,6 +40,7 @@ type User {
   id: ID!
   profilePhoto(size: ProfileImageSizes): Image
   bio: String
+  website: String
 }
 
 type ExchangeKey {
@@ -60,6 +61,7 @@ type Query {
 
 input UpdateUserInput {
   bio: String
+  website: String
 }
 
 input AddExchangeKeyInput {
@@ -80,7 +82,7 @@ type SignedUpload {
 
 type Mutation {
   updateUser(id: ID!, input: UpdateUserInput!): Boolean
-  addExchangeKeys(input: AddExchangeKeyInput): ExchangeKey
+  addExchangeKeys(input: AddExchangeKeyInput): Boolean
   deleteExchangeKeys(userID: ID!, exchangeID: ID!): Boolean
   signUpload(userID: ID!, key: String!): SignedUpload
 }
@@ -190,13 +192,7 @@ const resolvers = {
         ...input,
       });
 
-      const [exchangeKey] = await app.useCases.getExchangeKeys({
-        auth: context.auth,
-        userID: input.userID,
-        exchangeIDs: [input.exchangeID],
-      });
-
-      return exchangeKey;
+      return true;
     },
     async deleteExchangeKeys(root, { userID, exchangeID }, context) {
       await app.useCases.deleteExchangeKeys({ auth: context.auth, userID, exchangeID });
