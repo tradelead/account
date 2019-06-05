@@ -38,6 +38,9 @@ type Image {
 
 type User {
   id: ID!
+  email: String!
+  username: String!
+  roles: [String!]
   profilePhoto(size: ProfileImageSizes): Image
   bio: String
   website: String
@@ -53,10 +56,17 @@ type ExchangeKey {
   secret: String
 }
 
+type Exchange {
+  exchangeID: ID!
+  exchangeLabel: String!
+}
+
 type Query {
   getUsers(ids: [ID!]!): [User]!
+  getUserByUsername(username: String!): User!
   "If exchangeIDs is empty, then all exchange keys are returned"
   getExchangeKeys(userID: ID!, exchangeIDs: [ID!]): [ExchangeKey]
+  getExchanges: [Exchange]
 }
 
 input UpdateUserInput {
@@ -122,7 +132,7 @@ const userDataLoader = new Dataloader(async (items) => {
   }, {}));
 
   // fetch account data
-  const accountData = await app.useCases.getAccountData({ data });
+  const accountData = (await app.useCases.getAccountData({ data })) || [];
 
   const accountDataObj = accountData.reduce((acc, resp) => {
     const { userID } = resp;
@@ -130,13 +140,46 @@ const userDataLoader = new Dataloader(async (items) => {
     return acc;
   }, {});
 
+  // fetch user identities
+  const userIDs = Object.values(items.reduce((acc, item) => {
+    if (
+      item.type === 'user'
+      && !item.identity
+      && ['username', 'email', 'roles'].some(f => Object.keys(item.fields).includes(f))
+    ) {
+      acc[item.id] = item.id;
+    }
+
+    return acc;
+  }, {}));
+
+  const users = (await app.useCases.getUserIdentities(userIDs)) || [];
+  let usersObj = users.reduce((acc, user) => {
+    acc[user.id] = user;
+    return acc;
+  }, {});
+
+  usersObj = {
+    ...usersObj,
+    ...items.reduce((acc, item) => {
+      if (item.identity) {
+        acc[item.id] = item.identity;
+      }
+
+      return acc;
+    }, {}),
+  };
+
   // map account data to input orders
   return items.map((item) => {
     const userData = accountDataObj[item.id];
     if (item.type === 'user') {
+      const userIdentity = usersObj[item.id] || {};
+
       return {
         id: item.id,
         ...userData,
+        ...userIdentity,
       };
     }
 
@@ -165,6 +208,21 @@ const resolvers = {
     },
     async getExchangeKeys(root, { userID, exchangeIDs }, context) {
       return app.useCases.getExchangeKeys({ auth: context.auth, userID, exchangeIDs });
+    },
+    async getExchanges() {
+      return app.validExchanges;
+    },
+    async getUserByUsername(root, { username }, _, info) {
+      const fields = graphqlFields(info);
+
+      const identity = await app.useCases.getUserIdentityByUsername(username);
+
+      return userDataLoader.load({
+        type: 'user',
+        id: identity.id,
+        identity,
+        fields,
+      });
     },
   },
   User: {

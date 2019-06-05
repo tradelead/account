@@ -84,9 +84,29 @@ test('getUsers with profilePhoto', async () => {
       },
     ]);
 
+  app.useCases.getUserIdentities
+    .withArgs(['user1', 'user2'])
+    .resolves([
+      {
+        id: 'user1',
+        username: 'testname',
+        email: 'test@test.com',
+        roles: ['trader', 'test'],
+      },
+      {
+        id: 'user2',
+        username: 'testname2',
+        email: 'test2@test.com',
+        roles: ['trader', 'test'],
+      },
+    ]);
+
   const source = `{
     getUsers(ids: ["user1", "user2"]) {
       id
+      username
+      email
+      roles
       bio
       website
       profilePhoto(size: thumbnail) {
@@ -106,6 +126,9 @@ test('getUsers with profilePhoto', async () => {
     .toEqual([
       {
         id: 'user1',
+        username: 'testname',
+        email: 'test@test.com',
+        roles: ['trader', 'test'],
         bio: 'this is my bio',
         website: 'http://test.com',
         profilePhoto: {
@@ -116,6 +139,9 @@ test('getUsers with profilePhoto', async () => {
       },
       {
         id: 'user2',
+        username: 'testname2',
+        email: 'test2@test.com',
+        roles: ['trader', 'test'],
         bio: 'this is my bio',
         website: 'http://test.com',
         profilePhoto: {
@@ -125,6 +151,104 @@ test('getUsers with profilePhoto', async () => {
         },
       },
     ]);
+});
+
+test('GetUserByUsername', async () => {
+  // mock response
+  app.useCases.getUserIdentityByUsername
+    .withArgs('testname')
+    .resolves(
+      {
+        id: 'user1',
+        username: 'testname',
+        email: 'test@test.com',
+        roles: ['trader', 'test'],
+      },
+    );
+
+  app.useCases.getAccountData
+    .withArgs({
+      data: [
+        {
+          userID: 'user1',
+          keys: ['bio', 'website'],
+        },
+      ],
+    })
+    .resolves([
+      {
+        userID: 'user1',
+        data: {
+          bio: 'this is my bio',
+          website: 'http://test.com',
+        },
+      },
+    ]);
+
+  app.useCases.getAccountData
+    .withArgs({
+      data: [
+        {
+          userID: 'user1',
+          keys: [
+            {
+              key: 'profilePhoto',
+              size: 'thumbnail',
+            },
+          ],
+        },
+      ],
+    })
+    .resolves([
+      {
+        userID: 'user1',
+        data: {
+          profilePhoto: {
+            url: 'http://example.com/thumbnail.png',
+            width: 150,
+            height: 150,
+          },
+        },
+      },
+    ]);
+
+  const source = `{
+    getUserByUsername(username: "testname") {
+      id
+      username
+      email
+      roles
+      bio
+      website
+      profilePhoto(size: thumbnail) {
+        url
+        width
+        height
+      }
+    }
+  }`;
+
+  const resp = await graphql({
+    schema,
+    source,
+  });
+
+  expect(resp.data.getUserByUsername)
+    .toEqual(
+      {
+        id: 'user1',
+        username: 'testname',
+        email: 'test@test.com',
+        roles: ['trader', 'test'],
+        bio: 'this is my bio',
+        website: 'http://test.com',
+        profilePhoto: {
+          url: 'http://example.com/thumbnail.png',
+          width: 150,
+          height: 150,
+        },
+      },
+    );
 });
 
 test('getExchangeKeys', async () => {
@@ -294,4 +418,32 @@ test('signUpload', async () => {
       randomB: '2',
     },
   });
+});
+
+test('getExchanges', async () => {
+  const source = `query {
+    getExchanges {
+      exchangeID
+      exchangeLabel
+    }
+  }`;
+
+  const context = {};
+  const res = await graphql(
+    schema,
+    source,
+    null,
+    context,
+  );
+
+  expect(res.data.getExchanges).toEqual([
+    {
+      exchangeID: 'binance',
+      exchangeLabel: 'Binance',
+    },
+    {
+      exchangeID: 'bittrex',
+      exchangeLabel: 'Bittrex',
+    },
+  ]);
 });

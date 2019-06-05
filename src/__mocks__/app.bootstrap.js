@@ -8,6 +8,8 @@ module.exports = {
     addExchangeKeys: sinon.stub(),
     getExchangeKeys: sinon.stub(),
     deleteExchangeKeys: sinon.stub(),
+    getUserIdentities: sinon.stub(),
+    getUserIdentityByUsername: sinon.stub(),
   },
   validExchanges: [
     {
