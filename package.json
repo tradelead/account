@@ -27,6 +27,7 @@
     "is-valid-domain": "0.0.9",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.16.3",
+    "lodash.get": "^4.4.2",
     "mime-types": "^2.1.24",
     "mysql": "^2.16.0",
     "node-fetch": "^2.4.0",

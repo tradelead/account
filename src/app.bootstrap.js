@@ -61,8 +61,6 @@ const exchangeKeysRepo = new ExchangeKeysRepo({ knex, encrypter });
 const authService = new KeycloakAuthService({
   serverUrl: process.env.KEYCLOAK_SERVER_URL,
   realm: process.env.KEYCLOAK_REALM,
-  clientId: process.env.KEYCLOAK_CLIENT_ID,
-  clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
 });
 
 /** setup services */
@@ -74,6 +72,7 @@ const UpdateAccountUrlData = require('./core/services/UpdateAccountUrlData');
 const GetAccountImageData = require('./core/services/GetAccountImageData');
 const UpdateAccountImageData = require('./core/services/UpdateAccountImageData');
 const DeleteAccountImageData = require('./core/services/DeleteAccountImageData');
+const UserIdentitiesService = require('./adapters/keycloak/UserIdentitiesService');
 
 const getAccountStringData = new GetAccountStringData({ accountDataConfig, accountDataRepo });
 const updateAccountStringData = new UpdateAccountStringData({ accountDataConfig, accountDataRepo });
@@ -88,6 +87,14 @@ const getAccountImageData = new GetAccountImageData({
   saveFile,
   updateAccountImageData,
 });
+
+const userIdentitiesService = new UserIdentitiesService({
+  serverUrl: process.env.KEYCLOAK_SERVER_URL,
+  realm: process.env.KEYCLOAK_REALM,
+  clientId: process.env.KEYCLOAK_CLIENT_ID,
+  clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
+});
+
 
 /** setup useCases */
 
@@ -172,6 +179,8 @@ module.exports = {
     addExchangeKeys: addExchangeKeys.execute.bind(addExchangeKeys),
     getExchangeKeys: getExchangeKeys.execute.bind(getExchangeKeys),
     deleteExchangeKeys: deleteExchangeKeys.execute.bind(deleteExchangeKeys),
+    getUserIdentities: userIdentitiesService.getUsers.bind(userIdentitiesService),
+    getUserIdentityByUsername: userIdentitiesService.getByUsername.bind(userIdentitiesService),
   },
   services: {
     authService,
