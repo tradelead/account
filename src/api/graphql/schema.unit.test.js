@@ -153,7 +153,7 @@ test('getUsers with profilePhoto', async () => {
     ]);
 });
 
-test('GetUserByUsername', async () => {
+test('getUserByUsername', async () => {
   // mock response
   app.useCases.getUserIdentityByUsername
     .withArgs('testname')
