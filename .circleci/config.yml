@@ -155,6 +155,8 @@ workflows:
       - executeChangeSet:
           requires:
             - createChangeSet
+            - unitTest
+            - intTest
           filters:
             branches:
               only:
