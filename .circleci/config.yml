@@ -65,6 +65,8 @@ jobs:
           PARAMETERS+="KeycloakRealm=$KEYCLOAK_REALM "
           PARAMETERS+="KeycloakClientID=$KEYCLOAK_CLIENT_ID "
           PARAMETERS+="KeycloakClientSecret=$KEYCLOAK_CLIENT_SECRET "
+          PARAMETERS+="S3Bucket=$S3_BUCKET "
+          PARAMETERS+="AwsKmsCmk=$AWS_KMS_CMK "
           PARAMETERS+="NodeEnv=$NODE_ENV "
           PARAMETERS+="MockExchangeService=false "
 

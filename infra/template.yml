@@ -9,6 +9,8 @@ Outputs:
       Name: !Sub '${AWS::StackName}-UploadCompleteArn'
     Value: !GetAtt 'UploadComplete.Arn'
 Parameters:
+  AwsKmsCmk:
+    Type: String
   CoreStack:
     Type: String
   KeycloakClientID:
@@ -27,6 +29,8 @@ Parameters:
     Type: String
   NodeEnv:
     Type: String
+  S3Bucket:
+    Type: String
 Resources:
   AccountMedia:
     Type: AWS::S3::Bucket
@@ -42,6 +46,7 @@ Resources:
       CodeUri: ../.
       Environment:
         Variables:
+          AWS_KMS_CMK: !Ref 'AwsKmsCmk'
           DATABASE_HOST: !ImportValue
             Fn::Sub: ${CoreStack}-MySQL-Address
           DATABASE_NAME: !Ref 'MySQLDbName'
@@ -56,6 +61,7 @@ Resources:
           KEYCLOAK_REALM: !Ref 'KeycloakRealm'
           KEYCLOAK_SERVER_URL: !Ref 'KeycloakServerURL'
           NODE_ENV: !Ref 'NodeEnv'
+          S3_BUCKET: !Ref 'S3Bucket'
       Events:
         API:
           Properties:
@@ -79,6 +85,7 @@ Resources:
       CodeUri: ../.
       Environment:
         Variables:
+          AWS_KMS_CMK: !Ref 'AwsKmsCmk'
           DATABASE_HOST: !ImportValue
             Fn::Sub: ${CoreStack}-MySQL-Address
           DATABASE_NAME: !Ref 'MySQLDbName'
@@ -93,6 +100,7 @@ Resources:
           KEYCLOAK_REALM: !Ref 'KeycloakRealm'
           KEYCLOAK_SERVER_URL: !Ref 'KeycloakServerURL'
           NODE_ENV: !Ref 'NodeEnv'
+          S3_BUCKET: !Ref 'S3Bucket'
       Handler: src/lambda/UploadComplete.handler
       Policies:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole

@@ -17,6 +17,8 @@ t.add_parameter(Parameter('KeycloakServerURL', Type='String'))
 t.add_parameter(Parameter('KeycloakRealm', Type='String'))
 t.add_parameter(Parameter('KeycloakClientID', Type='String'))
 t.add_parameter(Parameter('KeycloakClientSecret', Type='String'))
+t.add_parameter(Parameter('S3Bucket', Type='String'))
+t.add_parameter(Parameter('AwsKmsCmk', Type='String'))
 
 # Lambda Variables
 
@@ -45,6 +47,8 @@ lambdaEnvVars = {
     'KEYCLOAK_REALM': Ref('KeycloakRealm'),
     'KEYCLOAK_CLIENT_ID': Ref('KeycloakClientID'),
     'KEYCLOAK_CLIENT_SECRET': Ref('KeycloakClientSecret'),
+    'S3_BUCKET': Ref('S3Bucket'),
+    'AWS_KMS_CMK': Ref('AwsKmsCmk'),
 }
 
 # Setup Resources
