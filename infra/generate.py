@@ -85,7 +85,10 @@ graphQL.Policies = [
             {
                 'Effect': 'Allow',
                 'Action': ['s3:PutObject', 's3:GetObject'],
-                'Resource': accountMediaBucket.GetAtt('Arn'),
+                'Resource': [
+                    accountMediaBucket.GetAtt('Arn'),
+                    Sub('${AccountMedia.Arn}/*'),
+                ],
             },
             {
                 'Effect': 'Allow',
@@ -112,7 +115,10 @@ uploadComplete = t.add_resource(serverless.Function(
                 {
                     'Effect': 'Allow',
                     'Action': ['s3:PutObject', 's3:GetObject'],
-                    'Resource': accountMediaBucket.GetAtt('Arn'),
+                    'Resource': [
+                        accountMediaBucket.GetAtt('Arn'),
+                        Sub('${AccountMedia.Arn}/*'),
+                    ],
                 },
                 {
                     'Effect': 'Allow',

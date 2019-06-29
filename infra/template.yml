@@ -84,7 +84,9 @@ Resources:
                 - s3:PutObject
                 - s3:GetObject
               Effect: Allow
-              Resource: !GetAtt 'AccountMedia.Arn'
+              Resource:
+                - !GetAtt 'AccountMedia.Arn'
+                - !Sub '${AccountMedia.Arn}/*'
             - Action: s3:PutBucketPublicAccessBlock
               Effect: Allow
               Resource: !GetAtt 'AccountMedia.Arn'
@@ -127,7 +129,9 @@ Resources:
                 - s3:PutObject
                 - s3:GetObject
               Effect: Allow
-              Resource: !GetAtt 'AccountMedia.Arn'
+              Resource:
+                - !GetAtt 'AccountMedia.Arn'
+                - !Sub '${AccountMedia.Arn}/*'
             - Action: s3:PutBucketPublicAccessBlock
               Effect: Allow
               Resource: !GetAtt 'AccountMedia.Arn'
