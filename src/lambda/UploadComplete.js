@@ -12,7 +12,16 @@ exports.handler = async function (event) {
     const dataKey = Metadata['x-amz-meta-key'];
     const userID = Metadata['x-amz-meta-userid'];
 
-    const url = `http(s)://${Bucket}.s3.amazonaws.com/${Key}`;
+    const url = `https://${Bucket}.s3.amazonaws.com/${Key}`;
+
+    console.log(JSON.stringify({
+      Bucket,
+      Key,
+      Metadata,
+      url,
+      userID,
+      dataKey,
+    }));
     await app.controllers.newImageUpload({ url, userID, key: dataKey });
   });
 
