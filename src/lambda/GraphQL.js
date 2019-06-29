@@ -7,6 +7,7 @@ const context = async ({ event }) => {
   let auth = {};
 
   try {
+    console.log(JSON.stringify(event.headers));
     if (event.headers.Authorization.startsWith('Bearer')) {
       const token = event.headers.Authorization.split(' ').pop();
       auth = await app.services.authService.get(token);
