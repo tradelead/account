@@ -95,6 +95,11 @@ graphQL.Policies = [
                 'Action': 's3:PutBucketPublicAccessBlock',
                 'Resource': accountMediaBucket.GetAtt('Arn')
             },
+            {
+                'Effect': 'Allow',
+                'Action': ['kms:Decrypt', 'kms:Encrypt'],
+                'Resource': Sub('arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${AwsKmsCmk}'),
+            },
         ],
     }
 ]
