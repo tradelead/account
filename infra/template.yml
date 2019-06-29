@@ -81,8 +81,29 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
         - Statement:
             - Action:
+                - s3:DeleteObjectTagging
+                - s3:GetObjectRetention
+                - s3:GetObjectVersionTagging
+                - s3:ReplicateTags
+                - s3:PutObjectVersionTagging
+                - s3:DeleteObjectVersionTagging
+                - s3:PutObjectLegalHold
+                - s3:GetObjectLegalHold
+                - s3:GetReplicationConfiguration
+                - s3:GetObjectVersionTorrent
                 - s3:PutObject
+                - s3:GetObjectAcl
                 - s3:GetObject
+                - s3:GetObjectTorrent
+                - s3:AbortMultipartUpload
+                - s3:PutObjectRetention
+                - s3:PutObjectVersionAcl
+                - s3:GetObjectVersionAcl
+                - s3:GetObjectTagging
+                - s3:PutObjectTagging
+                - s3:GetObjectVersionForReplication
+                - s3:PutObjectAcl
+                - s3:GetObjectVersion
               Effect: Allow
               Resource:
                 - !GetAtt 'AccountMedia.Arn'
@@ -131,8 +152,29 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
         - Statement:
             - Action:
+                - s3:DeleteObjectTagging
+                - s3:GetObjectRetention
+                - s3:GetObjectVersionTagging
+                - s3:ReplicateTags
+                - s3:PutObjectVersionTagging
+                - s3:DeleteObjectVersionTagging
+                - s3:PutObjectLegalHold
+                - s3:GetObjectLegalHold
+                - s3:GetReplicationConfiguration
+                - s3:GetObjectVersionTorrent
                 - s3:PutObject
+                - s3:GetObjectAcl
                 - s3:GetObject
+                - s3:GetObjectTorrent
+                - s3:AbortMultipartUpload
+                - s3:PutObjectRetention
+                - s3:PutObjectVersionAcl
+                - s3:GetObjectVersionAcl
+                - s3:GetObjectTagging
+                - s3:PutObjectTagging
+                - s3:GetObjectVersionForReplication
+                - s3:PutObjectAcl
+                - s3:GetObjectVersion
               Effect: Allow
               Resource:
                 - !GetAtt 'AccountMedia.Arn'
