@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  GraphQL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ./src/lambda/GraphQL.handler
+      Runtime: nodejs10.x
+      Timeout: 30
+      Environment:
+        Variables:
+          DATABASE_PORT: 9966
+          DATABASE_HOST: host.docker.internal
+          DATABASE_NAME: test
+          DATABASE_USER: root
+          DATABASE_PASSWORD: root
+          DATABASE_POOL_MIN: 1
+          DATABASE_POOL_MAX: 10
+          TZ: UTC
+          KEYCLOAK_SERVER_URL: https://service.tradelead.io/auth
+          KEYCLOAK_REALM: main
+          KEYCLOAK_CLIENT_ID: accountService
+          KEYCLOAK_CLIENT_SECRET: 42b4f011-5435-4d8b-910a-f2cf525584fa
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /graphql
+            Method: post

@@ -7,8 +7,8 @@ const context = async ({ event }) => {
   let auth = {};
 
   try {
-    if (event.headers.authorization.startsWith('Bearer')) {
-      const token = event.headers.authorization.split(' ').pop();
+    if (event.headers.Authorization.startsWith('Bearer')) {
+      const token = event.headers.Authorization.split(' ').pop();
       auth = await app.services.authService.get(token);
     }
   } catch (e) {
