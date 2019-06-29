@@ -29,10 +29,18 @@ Parameters:
     Type: String
   NodeEnv:
     Type: String
-  S3Bucket:
-    Type: String
 Resources:
   AccountMedia:
+    Properties:
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              - POST
+            AllowedOrigins:
+              - '*'
     Type: AWS::S3::Bucket
   AccountMediaBucketInvokeUploadComplete:
     Properties:
@@ -61,7 +69,7 @@ Resources:
           KEYCLOAK_REALM: !Ref 'KeycloakRealm'
           KEYCLOAK_SERVER_URL: !Ref 'KeycloakServerURL'
           NODE_ENV: !Ref 'NodeEnv'
-          S3_BUCKET: !Ref 'S3Bucket'
+          S3_BUCKET: !Ref 'AccountMedia'
       Events:
         API:
           Properties:
@@ -71,6 +79,16 @@ Resources:
       Handler: src/lambda/GraphQL.handler
       Policies:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - Statement:
+            - Action:
+                - s3:PutObject
+                - s3:GetObject
+              Effect: Allow
+              Resource: !GetAtt 'AccountMedia.Arn'
+            - Action: s3:PutBucketPublicAccessBlock
+              Effect: Allow
+              Resource: !GetAtt 'AccountMedia.Arn'
+          Version: '2012-10-17'
       Runtime: nodejs8.10
       VpcConfig:
         SecurityGroupIds:
@@ -100,10 +118,20 @@ Resources:
           KEYCLOAK_REALM: !Ref 'KeycloakRealm'
           KEYCLOAK_SERVER_URL: !Ref 'KeycloakServerURL'
           NODE_ENV: !Ref 'NodeEnv'
-          S3_BUCKET: !Ref 'S3Bucket'
+          S3_BUCKET: !Ref 'AccountMedia'
       Handler: src/lambda/UploadComplete.handler
       Policies:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - Statement:
+            - Action:
+                - s3:PutObject
+                - s3:GetObject
+              Effect: Allow
+              Resource: !GetAtt 'AccountMedia.Arn'
+            - Action: s3:PutBucketPublicAccessBlock
+              Effect: Allow
+              Resource: !GetAtt 'AccountMedia.Arn'
+          Version: '2012-10-17'
       Runtime: nodejs8.10
       VpcConfig:
         SecurityGroupIds:

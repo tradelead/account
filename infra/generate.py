@@ -17,8 +17,19 @@ t.add_parameter(Parameter('KeycloakServerURL', Type='String'))
 t.add_parameter(Parameter('KeycloakRealm', Type='String'))
 t.add_parameter(Parameter('KeycloakClientID', Type='String'))
 t.add_parameter(Parameter('KeycloakClientSecret', Type='String'))
-t.add_parameter(Parameter('S3Bucket', Type='String'))
 t.add_parameter(Parameter('AwsKmsCmk', Type='String'))
+
+# Create S3 Bucket
+accountMediaBucket = t.add_resource(s3.Bucket(
+    'AccountMedia',
+    CorsConfiguration = s3.CorsConfiguration(CorsRules = [
+        s3.CorsRules(
+            AllowedHeaders = ['*'],
+            AllowedMethods = ['GET', 'POST'],
+            AllowedOrigins = ['*'],
+        )
+    ]),
+))
 
 # Lambda Variables
 
@@ -47,7 +58,7 @@ lambdaEnvVars = {
     'KEYCLOAK_REALM': Ref('KeycloakRealm'),
     'KEYCLOAK_CLIENT_ID': Ref('KeycloakClientID'),
     'KEYCLOAK_CLIENT_SECRET': Ref('KeycloakClientSecret'),
-    'S3_BUCKET': Ref('S3Bucket'),
+    'S3_BUCKET': accountMediaBucket.Ref(),
     'AWS_KMS_CMK': Ref('AwsKmsCmk'),
 }
 
@@ -66,7 +77,24 @@ graphQL.Events = {
         }
     }
 }
-graphQL.Policies = ['arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole']
+graphQL.Policies = [
+    'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole',
+    {
+        'Version': '2012-10-17',
+        'Statement': [
+            {
+                'Effect': 'Allow',
+                'Action': ['s3:PutObject', 's3:GetObject'],
+                'Resource': accountMediaBucket.GetAtt('Arn'),
+            },
+            {
+                'Effect': 'Allow',
+                'Action': 's3:PutBucketPublicAccessBlock',
+                'Resource': accountMediaBucket.GetAtt('Arn')
+            },
+        ],
+    }
+]
 graphQL.VpcConfig = lambdaVpcConfig
 graphQL.Environment = awslambda.Environment(None, Variables = lambdaEnvVars)
 t.add_resource(graphQL)
@@ -76,12 +104,27 @@ uploadComplete = t.add_resource(serverless.Function(
     Runtime = nodeRuntime,
     CodeUri = lambdaSrcPath,
     Handler = lambdaHandlerPath + 'UploadComplete.handler',
-    Policies = ['arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'],
+    Policies = [
+        'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole',
+        {
+            'Version': '2012-10-17',
+            'Statement': [
+                {
+                    'Effect': 'Allow',
+                    'Action': ['s3:PutObject', 's3:GetObject'],
+                    'Resource': accountMediaBucket.GetAtt('Arn'),
+                },
+                {
+                    'Effect': 'Allow',
+                    'Action': 's3:PutBucketPublicAccessBlock',
+                    'Resource': accountMediaBucket.GetAtt('Arn')
+                },
+            ],
+        }
+    ],
     VpcConfig = lambdaVpcConfig,
     Environment = awslambda.Environment(None, Variables = lambdaEnvVars),
 ))
-
-accountMediaBucket = t.add_resource(s3.Bucket('AccountMedia'))
 
 t.add_resource(awslambda.Permission(
     'AccountMediaBucketInvokeUploadComplete',
