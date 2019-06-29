@@ -9,8 +9,8 @@ exports.handler = async function (event) {
     const Key = record.s3.object.key;
     const { Metadata } = await s3.headObject({ Bucket, Key }).promise();
 
-    const dataKey = Metadata['x-amz-meta-key'];
-    const userID = Metadata['x-amz-meta-userid'];
+    const dataKey = Metadata.key;
+    const userID = Metadata.userid;
 
     const url = `https://${Bucket}.s3.amazonaws.com/${Key}`;
 
