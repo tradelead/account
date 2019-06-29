@@ -6,6 +6,11 @@ jest.mock('../../app.bootstrap');
 const schema = require('./schema');
 const app = require('../../app.bootstrap');
 
+beforeEach(() => {
+  app.useCases.getAccountData.reset();
+  app.useCases.getUserIdentities.reset();
+});
+
 test('getUsers with profilePhoto', async () => {
   // mock response
   app.useCases.getAccountData
@@ -149,6 +154,71 @@ test('getUsers with profilePhoto', async () => {
           width: 150,
           height: 150,
         },
+      },
+    ]);
+});
+
+test('getUsers that doesn\'t have data', async () => {
+  app.useCases.getUserIdentities
+    .withArgs(['user1', 'user2'])
+    .resolves([
+      {
+        id: 'user1',
+        username: 'testname',
+        email: 'test@test.com',
+        roles: ['trader', 'test'],
+      },
+      {
+        id: 'user2',
+        username: 'testname2',
+        email: 'test2@test.com',
+        roles: ['trader', 'test'],
+      },
+    ]);
+
+  const source = `{
+    getUsers(ids: ["user1", "user2"]) {
+      id
+      username
+      email
+      roles
+      bio
+      website
+      profilePhoto(size: thumbnail) {
+        url
+        width
+        height
+      }
+    }
+  }`;
+
+  const resp = await graphql({
+    schema,
+    source,
+  });
+
+  console.log(resp.errors);
+  expect(resp.errors).toBeUndefined();
+
+  expect(resp.data.getUsers)
+    .toEqual([
+      {
+        id: 'user1',
+        username: 'testname',
+        email: 'test@test.com',
+        roles: ['trader', 'test'],
+        bio: null,
+        website: null,
+        profilePhoto: null,
+      },
+      {
+        id: 'user2',
+        username: 'testname2',
+        email: 'test2@test.com',
+        roles: ['trader', 'test'],
+        bio: null,
+        website: null,
+        profilePhoto: null,
       },
     ]);
 });

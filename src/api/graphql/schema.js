@@ -172,10 +172,9 @@ const userDataLoader = new Dataloader(async (items) => {
 
   // map account data to input orders
   return items.map((item) => {
-    const userData = accountDataObj[item.id];
+    const userData = accountDataObj[item.id] || {};
     if (item.type === 'user') {
       const userIdentity = usersObj[item.id] || {};
-
       return {
         id: item.id,
         ...userData,
@@ -184,10 +183,7 @@ const userDataLoader = new Dataloader(async (items) => {
     }
 
     if (item.type === 'field') {
-      return {
-        id: item.id,
-        ...userData[item.key],
-      };
+      return userData[item.key];
     }
 
     return { id: item.id };
@@ -203,7 +199,6 @@ const resolvers = {
         id,
         fields,
       }));
-
       return Promise.all(promises);
     },
     async getExchangeKeys(root, { userID, exchangeIDs }, context) {
@@ -227,12 +222,14 @@ const resolvers = {
   },
   User: {
     async profilePhoto(user, input) {
-      return userDataLoader.load({
+      const field = await userDataLoader.load({
         type: 'field',
         id: user.id,
         key: 'profilePhoto',
         input,
       });
+
+      return field;
     },
   },
   Mutation: {

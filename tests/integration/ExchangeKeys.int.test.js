@@ -125,6 +125,9 @@ describe('getExchangeKeys', () => {
     const { userID } = req;
     await expect(app.useCases.getExchangeKeys({ auth: null, userID }))
       .rejects.toThrow('Invalid permissions');
+
+    await expect(app.useCases.getExchangeKeys({ auth: {}, userID }))
+      .rejects.toThrow('Invalid permissions');
   });
 });
 

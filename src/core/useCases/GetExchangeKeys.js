@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi');
 const validate = require('../utils/validateSchema');
 
-module.exports = class AddExchangeKeys {
+module.exports = class GetExchangeKeys {
   constructor({ exchangeKeysRepo }) {
     this.exchangeKeysRepo = exchangeKeysRepo;
 
@@ -25,7 +25,7 @@ module.exports = class AddExchangeKeys {
     } = validate(this.schema, req);
 
     const isOwner = auth && auth.id === userID;
-    const isSystem = auth && auth.roles.includes('system');
+    const isSystem = auth && auth.roles && auth.roles.includes('system');
     if (!auth || (!isOwner && !isSystem)) {
       throw new Error('Invalid permissions');
     }
