@@ -28,6 +28,16 @@ describe('update and get bio', () => {
     expect(accountData).toHaveProperty('data.bio', req.data.bio);
   });
 
+  it('updates trader bio with empty string when authenticated', async () => {
+    req.data.bio = '';
+    await app.useCases.updateAccountData(req);
+
+    const { userID } = req;
+    const keys = ['bio'];
+    const [accountData] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
+    expect(accountData).toHaveProperty('data.bio', req.data.bio);
+  });
+
   it('throws error when updating other trader bio when authenticated', async () => {
     req.userID = 'user234';
     await expect(app.useCases.updateAccountData(req)).rejects.toThrow('Invalid permissions');
@@ -83,6 +93,16 @@ describe('update and get website', () => {
     const keys = ['website'];
     const [accountData] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
     expect(accountData).toHaveProperty('data.website', 'http://test.com');
+  });
+
+  it('updates when empty', async () => {
+    req.data.website = '';
+    await app.useCases.updateAccountData(req);
+
+    const { userID } = req;
+    const keys = ['website'];
+    const [accountData] = await app.useCases.getAccountData({ data: [{ userID, keys }] });
+    expect(accountData).toHaveProperty('data.website', req.data.website);
   });
 
   it('throws error when updating with invalid url', async () => {

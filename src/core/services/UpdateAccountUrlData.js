@@ -12,7 +12,7 @@ module.exports = class UpdateAccountUrlData {
     const keysAllowed = Object.keys(this.accountDataConfig)
       .filter(key => this.accountDataConfig[key].type === 'url')
       .reduce((acc, key) => {
-        acc[key] = Joi.string();
+        acc[key] = Joi.string().allow('');
         return acc;
       }, {});
 
@@ -30,7 +30,7 @@ module.exports = class UpdateAccountUrlData {
     Object.keys(sanitizedData).forEach((key) => {
       const value = sanitizedData[key];
 
-      const { error } = Joi.string().uri().validate(value);
+      const { error } = Joi.string().uri().allow('').validate(value);
       if (!error) {
         return;
       }

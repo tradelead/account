@@ -10,7 +10,7 @@ module.exports = class UpdateAccountStringData {
     const keysAllowed = Object.keys(this.accountDataConfig)
       .filter(key => this.accountDataConfig[key].type === 'string')
       .reduce((acc, key) => {
-        acc[key] = Joi.string();
+        acc[key] = Joi.string().allow('');
         return acc;
       }, {});
 
