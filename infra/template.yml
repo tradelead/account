@@ -11,6 +11,14 @@ Outputs:
 Parameters:
   CoreStack:
     Type: String
+  KeycloakClientID:
+    Type: String
+  KeycloakClientSecret:
+    Type: String
+  KeycloakRealm:
+    Type: String
+  KeycloakServerURL:
+    Type: String
   MySQLDbName:
     Type: String
   MySQLPass:
@@ -43,6 +51,10 @@ Resources:
           DATABASE_PORT: !ImportValue
             Fn::Sub: ${CoreStack}-MySQL-Port
           DATABASE_USER: !Ref 'MySQLUser'
+          KEYCLOAK_CLIENT_ID: !Ref 'KeycloakClientID'
+          KEYCLOAK_CLIENT_SECRET: !Ref 'KeycloakClientSecret'
+          KEYCLOAK_REALM: !Ref 'KeycloakRealm'
+          KEYCLOAK_SERVER_URL: !Ref 'KeycloakServerURL'
           NODE_ENV: !Ref 'NodeEnv'
       Events:
         API:
@@ -76,6 +88,10 @@ Resources:
           DATABASE_PORT: !ImportValue
             Fn::Sub: ${CoreStack}-MySQL-Port
           DATABASE_USER: !Ref 'MySQLUser'
+          KEYCLOAK_CLIENT_ID: !Ref 'KeycloakClientID'
+          KEYCLOAK_CLIENT_SECRET: !Ref 'KeycloakClientSecret'
+          KEYCLOAK_REALM: !Ref 'KeycloakRealm'
+          KEYCLOAK_SERVER_URL: !Ref 'KeycloakServerURL'
           NODE_ENV: !Ref 'NodeEnv'
       Handler: src/lambda/UploadComplete.handler
       Policies:

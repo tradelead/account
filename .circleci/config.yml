@@ -61,6 +61,10 @@ jobs:
           PARAMETERS+="MySQLDbName=$MYSQL_DB_NAME "
           PARAMETERS+="MySQLUser=$MYSQL_USER "
           PARAMETERS+="MySQLPass=$MYSQL_PASS "
+          PARAMETERS+="KeycloakServerURL=$KEYCLOAK_SERVER_URL "
+          PARAMETERS+="KeycloakRealm=$KEYCLOAK_REALM "
+          PARAMETERS+="KeycloakClientID=$KEYCLOAK_CLIENT_ID "
+          PARAMETERS+="KeycloakClientSecret=$KEYCLOAK_CLIENT_SECRET "
           PARAMETERS+="NodeEnv=$NODE_ENV "
           PARAMETERS+="MockExchangeService=false "
 

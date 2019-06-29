@@ -13,6 +13,10 @@ t.add_parameter(Parameter('MySQLDbName', Type='String'))
 t.add_parameter(Parameter('MySQLUser', Type='String'))
 t.add_parameter(Parameter('MySQLPass', Type='String'))
 t.add_parameter(Parameter('NodeEnv', Type='String'))
+t.add_parameter(Parameter('KeycloakServerURL', Type='String'))
+t.add_parameter(Parameter('KeycloakRealm', Type='String'))
+t.add_parameter(Parameter('KeycloakClientID', Type='String'))
+t.add_parameter(Parameter('KeycloakClientSecret', Type='String'))
 
 # Lambda Variables
 
@@ -21,10 +25,10 @@ lambdaHandlerPath = 'src/lambda/'
 nodeRuntime = 'nodejs8.10'
 
 lambdaVpcConfig = awslambda.VPCConfig(
-    None, 
+    None,
     SecurityGroupIds=[
-        ImportValue(Sub('${CoreStack}-RDS-Access-SG-ID')), 
-    ], 
+        ImportValue(Sub('${CoreStack}-RDS-Access-SG-ID')),
+    ],
     SubnetIds=[ImportValue(Sub('${CoreStack}-SubnetID'))],
 )
 
@@ -37,6 +41,10 @@ lambdaEnvVars = {
     'DATABASE_POOL_MIN': 1,
     'DATABASE_POOL_MAX': 2,
     'NODE_ENV': Ref('NodeEnv'),
+    'KEYCLOAK_SERVER_URL': Ref('KeycloakServerURL'),
+    'KEYCLOAK_REALM': Ref('KeycloakRealm'),
+    'KEYCLOAK_CLIENT_ID': Ref('KeycloakClientID'),
+    'KEYCLOAK_CLIENT_SECRET': Ref('KeycloakClientSecret'),
 }
 
 # Setup Resources
@@ -81,8 +89,8 @@ t.add_resource(awslambda.Permission(
 
 def createExport(name, value, exportName):
     t.add_output(Output(
-        name, 
-        Value = value, 
+        name,
+        Value = value,
         Export = Export(exportName)
     ))
 
