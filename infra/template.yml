@@ -120,6 +120,13 @@ Resources:
                 - kms:Encrypt
               Effect: Allow
               Resource: !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${AwsKmsCmk}'
+            - Action: sns:Publish
+              Effect: Allow
+              Resource:
+                - !ImportValue
+                  Fn::Sub: ${CoreStack}-NewTraderExchangeTopicArn
+                - !ImportValue
+                  Fn::Sub: ${CoreStack}-RemoveTraderExchangeTopicArn
           Version: '2012-10-17'
       Runtime: nodejs8.10
       VpcConfig:

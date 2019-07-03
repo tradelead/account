@@ -126,6 +126,14 @@ graphQL.Policies = [
                 'Action': ['kms:Decrypt', 'kms:Encrypt'],
                 'Resource': Sub('arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${AwsKmsCmk}'),
             },
+            {
+                'Effect': 'Allow',
+                'Action': 'sns:Publish',
+                'Resource': [
+                    ImportValue(Sub('${CoreStack}-NewTraderExchangeTopicArn')),
+                    ImportValue(Sub('${CoreStack}-RemoveTraderExchangeTopicArn')),
+                ],
+            },
         ],
     }
 ]
