@@ -60,6 +60,8 @@ lambdaEnvVars = {
     'KEYCLOAK_CLIENT_SECRET': Ref('KeycloakClientSecret'),
     'S3_BUCKET': accountMediaBucket.Ref(),
     'AWS_KMS_CMK': Ref('AwsKmsCmk'),
+    'ADDED_KEYS_SNS_TOPIC_ARN': ImportValue(Sub('${CoreStack}-NewTraderExchangeTopicArn')),
+    'DELETED_KEYS_SNS_TOPIC_ARN': ImportValue(Sub('${CoreStack}-RemoveTraderExchangeTopicArn')),
 }
 
 # Setup Resources

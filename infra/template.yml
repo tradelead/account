@@ -54,6 +54,8 @@ Resources:
       CodeUri: ../.
       Environment:
         Variables:
+          ADDED_KEYS_SNS_TOPIC_ARN: !ImportValue
+            Fn::Sub: ${CoreStack}-NewTraderExchangeTopicArn
           AWS_KMS_CMK: !Ref 'AwsKmsCmk'
           DATABASE_HOST: !ImportValue
             Fn::Sub: ${CoreStack}-MySQL-Address
@@ -64,6 +66,8 @@ Resources:
           DATABASE_PORT: !ImportValue
             Fn::Sub: ${CoreStack}-MySQL-Port
           DATABASE_USER: !Ref 'MySQLUser'
+          DELETED_KEYS_SNS_TOPIC_ARN: !ImportValue
+            Fn::Sub: ${CoreStack}-RemoveTraderExchangeTopicArn
           KEYCLOAK_CLIENT_ID: !Ref 'KeycloakClientID'
           KEYCLOAK_CLIENT_SECRET: !Ref 'KeycloakClientSecret'
           KEYCLOAK_REALM: !Ref 'KeycloakRealm'
@@ -131,6 +135,8 @@ Resources:
       CodeUri: ../.
       Environment:
         Variables:
+          ADDED_KEYS_SNS_TOPIC_ARN: !ImportValue
+            Fn::Sub: ${CoreStack}-NewTraderExchangeTopicArn
           AWS_KMS_CMK: !Ref 'AwsKmsCmk'
           DATABASE_HOST: !ImportValue
             Fn::Sub: ${CoreStack}-MySQL-Address
@@ -141,6 +147,8 @@ Resources:
           DATABASE_PORT: !ImportValue
             Fn::Sub: ${CoreStack}-MySQL-Port
           DATABASE_USER: !Ref 'MySQLUser'
+          DELETED_KEYS_SNS_TOPIC_ARN: !ImportValue
+            Fn::Sub: ${CoreStack}-RemoveTraderExchangeTopicArn
           KEYCLOAK_CLIENT_ID: !Ref 'KeycloakClientID'
           KEYCLOAK_CLIENT_SECRET: !Ref 'KeycloakClientSecret'
           KEYCLOAK_REALM: !Ref 'KeycloakRealm'
