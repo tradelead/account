@@ -26,7 +26,7 @@
     "graphql-tools": "^4.0.4",
     "is-valid-domain": "0.0.9",
     "jsonwebtoken": "^8.5.1",
-    "knex": "^0.16.3",
+    "knex": "^2.4.0",
     "lodash.get": "^4.4.2",
     "memoizee": "^0.4.14",
     "mime-types": "^2.1.24",
